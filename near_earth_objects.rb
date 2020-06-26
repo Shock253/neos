@@ -8,27 +8,29 @@ Figaro.load
 
 class NearEarthObjects
   def self.find_neos_by_date(date)
-    asteroids_data = get_json('/neo/rest/v1/feed')[:"#{date}"]
+    asteroid_data = get_json('/neo/rest/v1/feed')[:"#{date}"]
 
-    formatted_asteroid_data = asteroids_data.map do |asteroid|
+    {
+      asteroid_list: format_asteroid_data(asteroid_data),
+      biggest_asteroid: largest_asteroid_diameter(asteroid_data),
+      total_number_of_asteroids: asteroid_data.count
+    }
+  end
+
+  private
+
+  def format_asteroid_data(asteroid_data)
+    asteroid_data.map do |asteroid|
       {
         name: asteroid[:name],
         diameter: "#{asteroid[:estimated_diameter][:feet][:estimated_diameter_max].to_i} ft",
         miss_distance: "#{asteroid[:close_approach_data][0][:miss_distance][:miles].to_i} miles"
       }
     end
-
-    {
-      asteroid_list: formatted_asteroid_data,
-      biggest_asteroid: largest_asteroid_diameter(asteroids_data),
-      total_number_of_asteroids: asteroids_data.count
-    }
   end
 
-  private
-
-  def largest_astroid_diameter(asteroids_data)
-    asteroids_data.map do |asteroid|
+  def largest_astroid_diameter(asteroid_data)
+    asteroid_data.map do |asteroid|
       asteroid[:estimated_diameter][:feet][:estimated_diameter_max].to_i
     end.max { |a,b| a<=> b}
   end
