@@ -8,7 +8,7 @@ Figaro.load
 
 class NearEarthObjects
   def self.find_neos_by_date(date)
-    asteroid_data = get_json('/neo/rest/v1/feed')[:"#{date}"]
+    asteroid_data = get_json('/neo/rest/v1/feed', date)[:"#{date}"]
 
     {
       asteroid_list: format_asteroid_data(asteroid_data),
@@ -29,13 +29,13 @@ class NearEarthObjects
     end
   end
 
-  def self.largest_astroid_diameter(asteroid_data)
+  def self.largest_asteroid_diameter(asteroid_data)
     asteroid_data.map do |asteroid|
       asteroid[:estimated_diameter][:feet][:estimated_diameter_max].to_i
     end.max { |a,b| a<=> b}
   end
 
-  def self.conn()
+  def self.conn(date)
     Faraday.new(
       url: 'https://api.nasa.gov',
       params: {
@@ -45,8 +45,8 @@ class NearEarthObjects
     )
   end
 
-  def self.get_json(path)
-    json = conn.get(path)
+  def self.get_json(path, date)
+    json = conn(date).get(path)
     JSON.parse(json.body, symbolize_names: true)[:near_earth_objects]
   end
 end
