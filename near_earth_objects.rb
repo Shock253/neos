@@ -19,7 +19,7 @@ class NearEarthObjects
 
   private
 
-  def format_asteroid_data(asteroid_data)
+  def self.format_asteroid_data(asteroid_data)
     asteroid_data.map do |asteroid|
       {
         name: asteroid[:name],
@@ -29,13 +29,13 @@ class NearEarthObjects
     end
   end
 
-  def largest_astroid_diameter(asteroid_data)
+  def self.largest_astroid_diameter(asteroid_data)
     asteroid_data.map do |asteroid|
       asteroid[:estimated_diameter][:feet][:estimated_diameter_max].to_i
     end.max { |a,b| a<=> b}
   end
 
-  def conn()
+  def self.conn()
     Faraday.new(
       url: 'https://api.nasa.gov',
       params: {
